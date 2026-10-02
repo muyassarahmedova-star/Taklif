@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Taklifnoma Studio ✨</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body {
+      background: radial-gradient(circle at top, #2b1049, #120726, #080112);
+      min-height: 100vh; display: flex; justify-content: center; align-items: center; color: #fff; padding: 14px;
+    }
+    .card {
+      width: 100%; max-width: 440px; background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+      border: 1px solid rgba(255, 255, 255, 0.16); border-radius: 24px;
+      padding: 24px 18px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+    }
+    h1 { font-size: 1.45rem; margin-bottom: 12px; color: #ff77a9; }
+    p { font-size: 0.9rem; color: #dfd7eb; margin-bottom: 18px; line-height: 1.4; }
+    
+    /* Konstruktor elementlari */
+    .form-box { text-align: left; margin-bottom: 16px; }
+    .form-box label { font-size: 0.8rem; font-weight: 600; color: #ffb4d0; display: block; margin-bottom: 6px; }
+    input[type="text"], select {
+      width: 100%; padding: 11px 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.2);
+      background: rgba(0, 0, 0, 0.35); color: #fff; font-size: 0.9rem; outline: none; margin-bottom: 8px;
+    }
+    .chip-wrap { display: flex; flex-wrap: wrap; gap: 6px; }
+    .chip-item {
+      background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
+      padding: 7px 11px; border-radius: 9px; font-size: 0.8rem; display: flex; align-items: center; gap: 5px;
+    }
+    .sub-place-card {
+      background: rgba(255, 255, 255, 0.05); border: 1px dashed rgba(255, 119, 169, 0.4);
+      padding: 10px; border-radius: 12px; margin-bottom: 8px;
+    }
+
+    /* Tugmalar */
+    .btn-action {
+      background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 12px; padding: 13px 10px; color: #fff; font-size: 0.88rem; width: 100%;
+      cursor: pointer; transition: 0.2s;
+    }
+    .btn-action.active { background: #ff4d8d; border-color: #ff80ab; transform: scale(0.97); }
+    .btn-main {
+      width: 100%; background: linear-gradient(135deg, #ff4d8d, #a838ff);
+      color: #fff; border: none; border-radius: 14px; padding: 13px; font-size: 0.95rem;
+      font-weight: 600; cursor: pointer; margin-top: 10px;
+    }
+    .btn-add {
+      background: rgba(255,255,255,0.15); border: none; color: #ffb4d0;
+      padding: 6px 12px; border-radius: 8px; font-size: 0.78rem; cursor: pointer;
+    }
+
+    /* Mehmon interfeysi */
+    .step { display: none; animation: fadeIn 0.35s ease forwards; }
+    .step.show { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Chipta */
+    .ticket {
+      background: #ffffff; color: #181818; border-radius: 18px; padding: 22px 18px;
+      text-align: left; border-top: 6px solid #ff4d8d; box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    }
+    .ticket-head { display: flex; justify-content: space-between; border-bottom: 2px dashed #ddd; padding-bottom: 10px; margin-bottom: 12px; }
+    .ticket-title { font-weight: 700; color: #8b1f5d; font-size: 1rem; }
+    .ticket-id { font-size: 0.75rem; background: #eee; padding: 3px 8px; border-radius: 6px; font-weight: 700; color: #444; }
+    .t-row { margin-bottom: 10px; }
+    .t-lbl { font-size: 0.7rem; color: #777; text-transform: uppercase; }
+    .t-val { font-size: 0.95rem; font-weight: 600; color: #111; margin-top: 2px; }
+    .qr-wrap {
+      border-top: 2px dashed #ddd; padding-top: 14px; margin-top: 12px;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .qr-box { width: 75px; height: 75px; border: 1px solid #e0e0e0; border-radius: 8px; flex-shrink: 0; cursor: pointer; }
+    .qr-box img { width: 100%; height: 100%; border-radius: 7px; }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+
+    <!-- ============================================== -->
+    <!-- 1. KONSTRUKTOR PANELI (SO'ROVNOMA TUZISH) -->
+    <!-- ============================================== -->
+    <div id="panel-builder" style="display: none;">
+      <h1>So'rovnoma Yaratish 🪄</h1>
+      <p>Barcha savol va variantlarni o'zingiz xohlagandek sozlang.</p>
+
+      <!-- 1. Salomlashish -->
+      <div class="form-box">
+        <label>1. Salomlashish matni</label>
+        <select id="b-greet-select" onchange="toggleGreetingInput(this.value)">
+          <option value="preset1">Tayyor 1: Salom! Senga ajoyib taklifim bor edi...</option>
+          <option value="preset2">Tayyor 2: Vaqting bormi? Birga aylanib kelsak degandim ✨</option>
+          <option value="custom">O'zim boshqa so'z yozaman...</option>
+        </select>
+        <input type="text" id="b-greet-custom" style="display:none;" placeholder="O'z salomlashish matningizni yozing..." />
+      </div>
+
+      <!-- 2. Kunlar -->
+      <div class="form-box">
+        <label>2. Qaysi kunlar variant bo'lsin? (Tanlang)</label>
+        <div class="chip-wrap" id="b-days">
+          <label class="chip-item"><input type="checkbox" value="Dushanba" checked> Dush</label>
+          <label class="chip-item"><input type="checkbox" value="Seshanba" checked> Sesh</label>
+          <label class="chip-item"><input type="checkbox" value="Chorshanba" checked> Chor</label>
+          <label class="chip-item"><input type="checkbox" value="Payshanba" checked> Pay</label>
+          <label class="chip-item"><input type="checkbox" value="Juma" checked> Juma</label>
+          <label class="chip-item"><input type="checkbox" value="Shanba" checked> Shan</label>
+          <label class="chip-item"><input type="checkbox" value="Yakshanba" checked> Yak</label>
+        </div>
+      </div>
+
+      <!-- 3. Vaqt -->
+      <div class="form-box">
+        <label>3. Vaqt tanlash bosqichi kerakmi?</label>
+        <label class="chip-item" style="width: fit-content;">
+          <input type="checkbox" id="b-time-needed" checked> Ha, vaqtni ham so'rasin
+        </label>
+      </div>
+
+      <!-- 4. Manzillar va Ichma-ich variantlar -->
+      <div class="form-box">
+        <label>4. Qayerga borish & ichki variantlar</label>
+        <div id="places-list">
+          <!-- Birlamchi shablonlar -->
+          <div class="sub-place-card">
+            <input type="text" class="main-p-name" value="🎬 Riviera (Kino)" placeholder="Asosiy joy (masalan, Kino)">
+            <input type="text" class="sub-p-name" value="Avatar, Venom, Kung Fu Panda" placeholder="Ichidagi variantlar (vergul bilan)">
+          </div>
+          <div class="sub-place-card">
+            <input type="text" class="main-p-name" value="🍜 Ovqatlanish (Food Court)" placeholder="Asosiy joy (masalan, Ovqatlanish)">
+            <input type="text" class="sub-p-name" value="Seoul Mun (Ramen), Evos, KFC" placeholder="Ichidagi variantlar (vergul bilan)">
+          </div>
+          <div class="sub-place-card">
+            <input type="text" class="main-p-name" value="⛸️ Alpomish (Muz saroyi)" placeholder="Asosiy joy">
+            <input type="text" class="sub-p-name" value="" placeholder="Ichki variant bo'lmasa, bo'sh qoldiring">
+          </div>
+        </div>
+        <button type="button" class="btn-add" onclick="addNewPlaceCard()">+ Yana joy qo'shish</button>
+      </div>
+
+      <!-- 5. Ismlar -->
+      <div class="form-box">
+        <label>5. Kimdan va Kimga?</label>
+        <input type="text" id="b-host" placeholder="Kim taklif qilyapti? (Masalan: Ali)" value="Ali">
+        <input type="text" id="b-guest" placeholder="Kim uchun taklifnoma? (Masalan: Malika)">
+      </div>
+
+      <!-- 6. Video / Link -->
+      <div class="form-box">
+        <label>6. QR kod uchun video/ssilka</label>
+        <input type="text" id="b-video" placeholder="https://t.me/alidanss/2" value="https://t.me/alidanss/2">
+      </div>
+
+      <button class="btn-main" onclick="buildShareableLink()">Tayyor havolani yaratish 🚀</button>
+
+      <!-- Natija linki -->
+      <div id="link-result" style="display:none; margin-top: 16px;">
+        <p style="font-size:0.8rem; color:#ffb4d0; margin-bottom: 6px;">Ushbu ssilkani nusxalab unga yuboring:</p>
+        <div id="link-text" style="background:rgba(0,0,0,0.4); padding:10px; border-radius:10px; font-size:0.75rem; word-break:break-all; border:1px dashed #ff4d8d; color:#a838ff; margin-bottom: 8px;"></div>
+        <button class="btn-action" style="background:#222;" onclick="copyResultLink()">Nusxalash 📋</button>
+      </div>
+    </div>
+
+
+    <!-- ============================================== -->
+    <!-- 2. MEHMON INTERFEYSI (QIZ UCHUN SO'ROVNOMA) -->
+    <!-- ============================================== -->
+    <div id="panel-guest" style="display: none;">
+
+      <!-- 1-qadam: Salomlashish -->
+      <div class="step show" id="g-step-1">
+        <div style="font-size: 3rem; margin-bottom: 8px;">💌</div>
+        <h1 id="view-title">Taklifnoma</h1>
+        <p id="view-greeting">...</p>
+        <button class="btn-main" onclick="nextGuestStep(2)">Ko'rish ➔</button>
+      </div>
+
+      <!-- 2-qadam: Kun tanlash -->
+      <div class="step" id="g-step-2">
+        <h1>Qaysi kuni bo'shsan?</h1>
+        <p>O'zingga ma'qul kunni belgilang:</p>
+        <div id="view-days" style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-bottom:16px;"></div>
+        <button class="btn-main" onclick="confirmDay()">Keyingisi ➔</button>
+      </div>
+
+      <!-- 3-qadam: Vaqt (Agar yoqilgan bo'lsa) -->
+      <div class="step" id="g-step-3">
+        <h1>Qaysi vaqtda qulay?</h1>
+        <p>Vaqt oralig'ini tanlang:</p>
+        <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:16px;">
+          <button class="btn-action" onclick="chooseTime(this, 'Ertalab (10:00 - 13:00)')">☀️ Ertalab (10:00 - 13:00)</button>
+          <button class="btn-action" onclick="chooseTime(this, 'Tushlikdan keyin (14:00 - 18:00)')">☕ Tushlikdan keyin (14:00 - 18:00)</button>
+          <button class="btn-action" onclick="chooseTime(this, 'Kechqurun (18:00 dan so\'ng)')">🌙 Kechqurun (18:00 dan so'ng)</button>
+        </div>
+        <button class="btn-main" onclick="confirmTime()">Keyingisi ➔</button>
+      </div>
+
+      <!-- 4-qadam: Asosiy manzil tanlash -->
+      <div class="step" id="g-step-4">
+        <h1>Qayerga boramiz?</h1>
+        <p>O'zing yoqtirgan biror rejani tanla:</p>
+        <div id="view-places" style="display:flex; flex-direction:column; gap:8px; margin-bottom:16px;"></div>
+        <button class="btn-main" onclick="confirmPlace()">Keyingisi ➔</button>
+      </div>
+
+      <!-- 5-qadam: Ichki variant (Masalan: qaysi kino yoki qaysi taom) -->
+      <div class="step" id="g-step-5">
+        <h1 id="sub-title">Tanlang</h1>
+        <p>Quyidagilardan qaysi biri ma'qul?</p>
+        <div id="view-sub-places" style="display:flex; flex-direction:column; gap:8px; margin-bottom:16px;"></div>
+        <button class="btn-main" onclick="finishTicket()">Chiptani olish 🎟️</button>
+      </div>
+
+      <!-- 6-qadam: Yakuniy Chipta -->
+      <div class="step" id="g-step-6">
+        <div class="ticket">
+          <div class="ticket-head">
+            <span class="ticket-title">UCHRASHUV CHIPTASI</span>
+            <span class="ticket-id" id="t-id">#0001</span>
+          </div>
+          <div class="t-row">
+            <div class="t-lbl">Mehmon</div>
+            <div class="t-val" id="t-guest">—</div>
+          </div>
+          <div class="t-row">
+            <div class="t-lbl">Belgilangan kun</div>
+            <div class="t-val" id="t-day">—</div>
+          </div>
+          <div class="t-row" id="t-time-box" style="display:none;">
+            <div class="t-lbl">Vaqti</div>
+            <div class="t-val" id="t-time">—</div>
+          </div>
+          <div class="t-row">
+            <div class="t-lbl">Rejalashtirilgan manzil</div>
+            <div class="t-val" id="t-place">—</div>
+          </div>
+          <div class="t-row">
+            <div class="t-lbl">Hamroh</div>
+            <div class="t-val" id="t-host">—</div>
+          </div>
+
+          <!-- QR Kod -->
+          <div class="qr-wrap" id="t-qr-wrap" style="display:none;">
+            <div class="qr-box" id="t-qr-box">
+              <img id="t-qr-img" src="" alt="QR" />
+            </div>
+            <div style="font-size:0.75rem; color:#555;">
+              <strong style="color:#ff4d8d; display:block; font-size:0.8rem;">Surpriz video! 🎥</strong>
+              Kamerada skaner qiling yoki to'g'ridan-to'g'ri QR ustiga bosing.
+            </div>
+          </div>
+        </div>
+        <p style="margin-top:14px; font-size:0.8rem; color:#ffb4d0;">Ushbu chiptani skrinshot qilib yuborishingiz mumkin ✨</p>
+      </div>
+
+    </div>
+
+  </div>
+
+  <script>
+    let appConfig = {};
+    let selDay = "", selTime = "", selMainPlace = null, selSubPlace = "";
+
+    // Brauzer ochilganda manzilni tekshirish
+    window.onload = function() {
+      const params = new URLSearchParams(window.location.search);
+      const dataStr = params.get('q');
+      if (dataStr) {
+        try {
+          appConfig = JSON.parse(decodeURIComponent(escape(atob(dataStr))));
+          document.getElementById('panel-guest').style.display = 'block';
+          renderGuestUI();
+        } catch (e) {
+          alert("Havola xato!");
+          document.getElementById('panel-builder').style.display = 'block';
+        }
+      } else {
+        document.getElementById('panel-builder').style.display = 'block';
+      }
+    };
+
+    // ==========================================
+    // KONSTRUKTOR MANTIQI
+    // ==========================================
+    function toggleGreetingInput(val) {
+      document.getElementById('b-greet-custom').style.display = (val === 'custom') ? 'block' : 'none';
+    }
+
+    function addNewPlaceCard() {
+      const div = document.createElement('div');
+      div.className = 'sub-place-card';
+      div.innerHTML = `
+        <input type="text" class="main-p-name" placeholder="Asosiy reja (masalan: Muzqaymoq)">
+        <input type="text" class="sub-p-name" placeholder="Ichki variantlar (vergul bilan, ixtiyoriy)">
+      `;
+      document.getElementById('places-list').appendChild(div);
+    }
+
+    function buildShareableLink() {
+      // 1. Salom
+      let greeting = "";
+      const gChoice = document.getElementById('b-greet-select').value;
+      if (gChoice === 'preset1') greeting = "Salom! Senga ajoyib taklifim bor edi, ko'rishga tayyormisan?";
+      else if (gChoice === 'preset2') greeting = "Vaqting bormi? Birga maroqli vaqt o'tkazsak degandim ✨";
+      else greeting = document.getElementById('b-greet-custom').value || "Salom! Birga aylanib kelsak degandim.";
+
+      // 2. Kunlar
+      const days = Array.from(document.querySelectorAll('#b-days input:checked')).map(el => el.value);
+      if (days.length === 0) return alert("Kamida 1 ta kunni tanlang!");
+
+      // 3. Vaqt
+      const hasTime = document.getElementById('b-time-needed').checked;
+
+      // 4. Manzillar
+      const placeCards = document.querySelectorAll('.sub-place-card');
+      const places = [];
+      placeCards.forEach(c => {
+        const m = c.querySelector('.main-p-name').value.trim();
+        const s = c.querySelector('.sub-p-name').value.trim();
+        if (m) {
+          places.push({
+            name: m,
+            subs: s ? s.split(',').map(x => x.trim()).filter(Boolean) : []
+          });
+        }
+      });
+      if (places.length === 0) return alert("Kamida 1 ta manzil kiriting!");
+
+      // 5. Ismlar & QR
+      const host = document.getElementById('b-host').value.trim() || "Ali";
+      const guest = document.getElementById('b-guest').value.trim() || "Siz";
+      const video = document.getElementById('b-video').value.trim();
+
+      const payload = { g: greeting, d: days, t: hasTime, p: places, h: host, u: guest, v: video };
+      const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
+      const link = window.location.origin + window.location.pathname + "?q=" + encoded;
+
+      document.getElementById('link-text').innerText = link;
+      document.getElementById('link-result').style.display = 'block';
+    }
+
+    function copyResultLink() {
+      const text = document.getElementById('link-text').innerText;
+      navigator.clipboard.writeText(text).then(() => alert("Havola nusxalandi! Endi uni yuborishingiz mumkin."));
+    }
+
+    // ==========================================
+    // MEHMON INTERFEYSI MANTIQI
+    // ==========================================
+    function renderGuestUI() {
+      document.getElementById('view-greeting').innerText = appConfig.g;
+      if (appConfig.u && appConfig.u !== "Siz") {
+        document.getElementById('view-title').innerText = `${appConfig.u} uchun taklifnoma ✨`;
+      }
+
+      // Kunlar
+      const dBox = document.getElementById('view-days');
+      appConfig.d.forEach(day => {
+        const b = document.createElement('button');
+        b.className = 'btn-action';
+        b.innerText = day;
+        b.onclick = () => {
+          dBox.querySelectorAll('.btn-action').forEach(x => x.classList.remove('active'));
+          b.classList.add('active');
+          selDay = day;
+        };
+        dBox.appendChild(b);
+      });
+
+      // Joylar
+      const pBox = document.getElementById('view-places');
+      appConfig.p.forEach(p => {
+        const b = document.createElement('button');
+        b.className = 'btn-action';
+        b.innerText = p.name;
+        b.onclick = () => {
+          pBox.querySelectorAll('.btn-action').forEach(x => x.classList.remove('active'));
+          b.classList.add('active');
+          selMainPlace = p;
+        };
+        pBox.appendChild(b);
+      });
+    }
+
+    function nextGuestStep(step) {
+      document.querySelectorAll('#panel-guest .step').forEach(s => s.classList.remove('show'));
+      document.getElementById('g-step-' + step).classList.add('show');
+    }
+
+    function confirmDay() {
+      if (!selDay) return alert("Iltimos, kunni belgilang!");
+      if (appConfig.t) nextGuestStep(3);
+      else nextGuestStep(4);
+    }
+
+    function chooseTime(btn, val) {
+      btn.parentElement.querySelectorAll('.btn-action').forEach(x => x.classList.remove('active'));
+      btn.classList.add('active');
+      selTime = val;
+    }
+    function confirmTime() {
+      if (!selTime) return alert("Vaqtni belgilang!");
+      nextGuestStep(4);
+    }
+
+    function confirmPlace() {
+      if (!selMainPlace) return alert("Manzilni tanlang!");
+      // Agar uning ichida variantlar bo'lsa (masalan qaysi kino):
+      if (selMainPlace.subs && selMainPlace.subs.length > 0) {
+        const sBox = document.getElementById('view-sub-places');
+        sBox.innerHTML = "";
+        document.getElementById('sub-title').innerText = `${selMainPlace.name}`;
+        selMainPlace.subs.forEach(sub => {
+          const b = document.createElement('button');
+          b.className = 'btn-action';
+          b.innerText = sub;
+          b.onclick = () => {
+            sBox.querySelectorAll('.btn-action').forEach(x => x.classList.remove('active'));
+            b.classList.add('active');
+            selSubPlace = sub;
+          };
+          sBox.appendChild(b);
+        });
+        nextGuestStep(5);
+      } else {
+        selSubPlace = "";
+        finishTicket();
+      }
+    }
+
+    function finishTicket() {
+      if (selMainPlace.subs && selMainPlace.subs.length > 0 && !selSubPlace) {
+        return alert("Iltimos, variantlardan birini tanlang!");
+      }
+
+      // Chiptani chiqarish
+      document.getElementById('t-id').innerText = `#TICKET-${Math.floor(1000 + Math.random()*9000)}`;
+      document.getElementById('t-guest').innerText = appConfig.u || "Siz";
+      document.getElementById('t-day').innerText = selDay;
+      document.getElementById('t-host').innerText = `${appConfig.h} bilan ☕`;
+
+      let finalPlace = selMainPlace.name;
+      if (selSubPlace) finalPlace += ` ➔ (${selSubPlace})`;
+      document.getElementById('t-place').innerText = finalPlace;
+
+      if (appConfig.t && selTime) {
+        document.getElementById('t-time-box').style.display = 'block';
+        document.getElementById('t-time').innerText = selTime;
+      }
+
+      // QR kod
+      if (appConfig.v) {
+        const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(appConfig.v)}`;
+        document.getElementById('t-qr-img').src = qrUrl;
+        document.getElementById('t-qr-box').onclick = () => window.open(appConfig.v, '_blank');
+        document.getElementById('t-qr-wrap').style.display = 'flex';
+      }
+
+      nextGuestStep(6);
+    }
+  </script>
+</body>
+</html>
